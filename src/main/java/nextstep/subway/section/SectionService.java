@@ -18,7 +18,7 @@ public class SectionService {
     private final LineService lineService;
 
     public LineResponse addSection(Long lineId, SectionRequest sectionRequest) {
-        Line line = lineService.findLine(lineId);
+        Line line = lineService.findLineById(lineId);
 
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
@@ -30,7 +30,7 @@ public class SectionService {
     }
 
     public void deleteSection(Long lineId, Long stationId) {
-        Line line = lineService.findLine(lineId);
+        Line line = lineService.findLineById(lineId);
 
         Section targetSection = line.findDeleteTargetSection(stationId);
         line.deleteSection(targetSection);

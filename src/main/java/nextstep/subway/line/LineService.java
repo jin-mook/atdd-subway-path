@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.NoLineExistException;
 import nextstep.subway.section.Section;
+import nextstep.subway.section.SectionRequest;
 import nextstep.subway.station.Station;
 import nextstep.subway.station.StationService;
 import org.springframework.stereotype.Service;
@@ -50,12 +51,13 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public Line findLine(Long lineId) {
+    public Line findLineById(Long lineId) {
         return findLineByIdWithSectionsAndStations(lineId);
     }
 
     public void updateLine(Long lineId, UpdateLineRequest updateLineRequest) {
-        Line line = findLineById(lineId);
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NoLineExistException(ErrorMessage.NO_LINE_EXIST));
         line.updateName(updateLineRequest.getName());
         line.updateColor(updateLineRequest.getColor());
     }
@@ -70,8 +72,16 @@ public class LineService {
                 .orElseThrow(() -> new NoLineExistException(ErrorMessage.NO_LINE_EXIST));
     }
 
-    private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId)
-                .orElseThrow(() -> new NoLineExistException(ErrorMessage.NO_LINE_EXIST));
+    public LineResponse addSection(long lineId, SectionRequest sectionRequest) {
+        Line line = findLineByIdWithSectionsAndStations(lineId);
+
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        line.addSection(section);
+
+        return LineResponse.from(line);
+
     }
 }
