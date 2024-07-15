@@ -62,4 +62,12 @@ public class Line {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
+    public List<Station> getStations() {
+        return mapSectionStations(station -> station);
+    }
+
+    public List<Section> getSections() {
+        return sections.getSections();
+    }
 }
