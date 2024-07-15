@@ -2,7 +2,7 @@ package nextstep.subway.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import nextstep.subway.section.SectionRequest;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.MediaType;
 
 public class SectionAssuredTemplate {

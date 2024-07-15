@@ -1,7 +1,10 @@
-package nextstep.subway.line;
+package nextstep.subway.line.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.UpdateLineRequest;
 import nextstep.subway.utils.LineAssuredTemplate;
 import nextstep.subway.utils.StationAssuredTemplate;
 import org.assertj.core.api.Assertions;

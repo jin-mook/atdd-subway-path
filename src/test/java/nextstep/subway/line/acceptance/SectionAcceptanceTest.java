@@ -1,10 +1,11 @@
-package nextstep.subway.section;
+package nextstep.subway.line.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.common.ErrorMessage;
-import nextstep.subway.line.LineRequest;
-import nextstep.subway.line.LineStationsResponse;
+import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.LineStationsResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.StationFixtures;
 import nextstep.subway.utils.LineAssuredTemplate;
 import nextstep.subway.utils.SectionAssuredTemplate;

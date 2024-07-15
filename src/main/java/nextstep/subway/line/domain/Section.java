@@ -1,11 +1,10 @@
-package nextstep.subway.section;
+package nextstep.subway.line.domain;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.IllegalDistanceValueException;
 import nextstep.subway.exception.NotSameUpAndDownStationException;
-import nextstep.subway.line.Line;
 import nextstep.subway.station.Station;
 
 import javax.persistence.*;
@@ -60,7 +59,7 @@ public class Section {
         return downStation;
     }
 
-    public void addMappingWithLine(Line line) {
+    public void setMappingWithLine(Line line) {
         this.line = line;
     }
 }

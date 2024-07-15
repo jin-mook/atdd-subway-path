@@ -2,8 +2,8 @@ package nextstep.subway.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import nextstep.subway.line.LineRequest;
-import nextstep.subway.line.UpdateLineRequest;
+import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.UpdateLineRequest;
 import org.springframework.http.MediaType;
 
 public class LineAssuredTemplate {

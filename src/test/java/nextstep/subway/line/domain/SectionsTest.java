@@ -1,8 +1,10 @@
-package nextstep.subway.section;
+package nextstep.subway.line.domain;
 
 import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.CannotDeleteSectionException;
 import nextstep.subway.exception.NotSameUpAndDownStationException;
+import nextstep.subway.line.domain.Section;
+import nextstep.subway.line.domain.Sections;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

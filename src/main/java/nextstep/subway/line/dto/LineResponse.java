@@ -1,8 +1,9 @@
-package nextstep.subway.line;
+package nextstep.subway.line.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nextstep.subway.line.domain.Line;
 
 import java.util.List;
 

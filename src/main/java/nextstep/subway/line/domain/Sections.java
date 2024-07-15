@@ -1,8 +1,9 @@
-package nextstep.subway.section;
+package nextstep.subway.line.domain;
 
 import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.CannotDeleteSectionException;
 import nextstep.subway.exception.NotSameUpAndDownStationException;
+import nextstep.subway.line.domain.Section;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;

@@ -1,8 +1,8 @@
 package nextstep.subway.unit;
 
-import nextstep.subway.line.Line;
-import nextstep.subway.section.Section;
-import nextstep.subway.section.SectionFixtures;
+import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.Section;
+import nextstep.subway.line.SectionFixtures;
 import nextstep.subway.station.Station;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;

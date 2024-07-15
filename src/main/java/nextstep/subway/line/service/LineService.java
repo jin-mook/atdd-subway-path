@@ -1,10 +1,15 @@
-package nextstep.subway.line;
+package nextstep.subway.line.service;
 
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.NoLineExistException;
-import nextstep.subway.section.Section;
-import nextstep.subway.section.SectionRequest;
+import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.UpdateLineRequest;
+import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.Section;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.Station;
 import nextstep.subway.station.StationService;
 import org.springframework.stereotype.Service;
@@ -19,7 +24,6 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-
     private final StationService stationService;
 
     public LineResponse saveLine(LineRequest lineRequest) {
@@ -67,11 +71,6 @@ public class LineService {
         lineRepository.delete(line);
     }
 
-    private Line findLineByIdWithSectionsAndStations(Long lineId) {
-        return lineRepository.findByIdWithSectionsAndStations(lineId)
-                .orElseThrow(() -> new NoLineExistException(ErrorMessage.NO_LINE_EXIST));
-    }
-
     public LineResponse addSection(long lineId, SectionRequest sectionRequest) {
         Line line = findLineByIdWithSectionsAndStations(lineId);
 
@@ -82,6 +81,17 @@ public class LineService {
         line.addSection(section);
 
         return LineResponse.from(line);
+    }
 
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineByIdWithSectionsAndStations(lineId);
+
+        Section targetSection = line.findDeleteTargetSection(stationId);
+        line.deleteSection(targetSection);
+    }
+
+    private Line findLineByIdWithSectionsAndStations(Long lineId) {
+        return lineRepository.findByIdWithSectionsAndStations(lineId)
+                .orElseThrow(() -> new NoLineExistException(ErrorMessage.NO_LINE_EXIST));
     }
 }

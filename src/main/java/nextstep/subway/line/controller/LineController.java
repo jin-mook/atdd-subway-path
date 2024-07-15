@@ -1,7 +1,12 @@
-package nextstep.subway.line;
+package nextstep.subway.line.controller;
 
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.common.SuccessResponse;
+import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.UpdateLineRequest;
+import nextstep.subway.line.service.LineService;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +49,21 @@ public class LineController {
     @DeleteMapping("/{lineId}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
         lineService.deleteLine(lineId);
+        return SuccessResponse.noContent();
+    }
+
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long lineId,
+                                                   @Validated @RequestBody SectionRequest sectionRequest) {
+        LineResponse data = lineService.addSection(lineId, sectionRequest);
+        return SuccessResponse.created(data);
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId,
+                                              @RequestParam("stationId") Long stationId) {
+
+        lineService.deleteSection(lineId, stationId);
         return SuccessResponse.noContent();
     }
 }

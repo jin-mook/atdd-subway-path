@@ -1,11 +1,11 @@
 package nextstep.subway.unit;
 
-import nextstep.subway.line.Line;
-import nextstep.subway.line.LineRepository;
-import nextstep.subway.line.LineResponse;
-import nextstep.subway.line.LineService;
-import nextstep.subway.section.SectionFixtures;
-import nextstep.subway.section.SectionRequest;
+import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.service.LineService;
+import nextstep.subway.line.SectionFixtures;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.StationFixtures;
 import nextstep.subway.station.StationService;
 import org.assertj.core.api.Assertions;

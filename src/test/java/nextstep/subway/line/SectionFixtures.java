@@ -1,5 +1,6 @@
-package nextstep.subway.section;
+package nextstep.subway.line;
 
+import nextstep.subway.line.domain.Section;
 import nextstep.subway.station.StationFixtures;
 
 public class SectionFixtures {
