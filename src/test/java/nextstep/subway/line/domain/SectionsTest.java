@@ -3,8 +3,6 @@ package nextstep.subway.line.domain;
 import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.CannotDeleteSectionException;
 import nextstep.subway.exception.NotSameUpAndDownStationException;
-import nextstep.subway.line.domain.Section;
-import nextstep.subway.line.domain.Sections;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -12,15 +10,30 @@ import org.junit.jupiter.api.Test;
 
 class SectionsTest {
 
+    @DisplayName("새로운 구역을 추가할 때 새로운 구역의 상행역과 하행역이 기존 구역에 존재하지 않으면 에러가 발생합니다.")
+    @Test
+    void noExist() {
+        // given
+        Sections sections = new Sections();
+        Section section = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
+        sections.addSection(section);
+
+        // when
+        Section newSection = new Section(StationFixtures.SECOND_UP_STATION, StationFixtures.SECOND_DOWN_STATION, 10L);
+        // then
+        Assertions.assertThatThrownBy(() -> sections.addSection(newSection))
+                .isInstanceOf(NotSameUpAndDownStationException.class);
+    }
+
     @DisplayName("새로운 구역을 추가할 때 새로운 구역의 상행역과 기존 마지막 구역의 하행역이 다르면 에러가 발생합니다.")
     @Test
     void noSameStation() {
         // given
         Sections sections = new Sections();
-        Section section = new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 10L);
+        Section section = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
         sections.addSection(section);
 
-        Section newSection = new Section(StationFixtures.NEW_UP_STATION, StationFixtures.NEW_DOWN_STATION, 10L);
+        Section newSection = new Section(StationFixtures.SECOND_UP_STATION, StationFixtures.SECOND_DOWN_STATION, 10L);
         // when
         // then
         Assertions.assertThatThrownBy(() -> sections.addSection(newSection))
@@ -32,16 +45,16 @@ class SectionsTest {
     void hasDownStation() {
         // given
         Sections sections = new Sections();
-        Section firstSection = new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 10L);
+        Section firstSection = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
 
         sections.addSection(firstSection);
 
-        Section secondSection = new Section(StationFixtures.DOWN_STATION, StationFixtures.NEW_DOWN_STATION, 10L);
+        Section secondSection = new Section(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_DOWN_STATION, 10L);
 
         sections.addSection(secondSection);
 
         // when
-        Section thirdSection = new Section(StationFixtures.NEW_DOWN_STATION, StationFixtures.UP_STATION, 10L);
+        Section thirdSection = new Section(StationFixtures.SECOND_DOWN_STATION, StationFixtures.FIRST_UP_STATION, 10L);
 
         // then
         Assertions.assertThatThrownBy(() -> sections.addSection(thirdSection))
@@ -53,7 +66,7 @@ class SectionsTest {
     void sectionEmpty() {
         // given
         Sections sections = new Sections();
-        Section section = new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 10L);
+        Section section = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
         // when
         sections.addSection(section);
 
@@ -66,10 +79,10 @@ class SectionsTest {
     void sameUpDownStation() {
         // given
         Sections sections = new Sections();
-        Section section = new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 10L);
+        Section section = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
         sections.addSection(section);
 
-        Section newSection = new Section(StationFixtures.DOWN_STATION, StationFixtures.NEW_DOWN_STATION, 10L);
+        Section newSection = new Section(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_DOWN_STATION, 10L);
         // when
         sections.addSection(newSection);
         // then
@@ -83,7 +96,7 @@ class SectionsTest {
         Sections sections = new Sections();
         // when
         // then
-        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.DOWN_STATION.getId()))
+        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.FIRST_DOWN_STATION.getId()))
                 .isInstanceOf(CannotDeleteSectionException.class)
                 .hasMessage(ErrorMessage.CANNOT_DELETE_SECTION.getMessage());
     }
@@ -93,11 +106,11 @@ class SectionsTest {
     void oneSection() {
         // given
         Sections sections = new Sections();
-        Section section = new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 10L);
+        Section section = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
         sections.addSection(section);
         // when
         // then
-        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.DOWN_STATION.getId()))
+        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.FIRST_DOWN_STATION.getId()))
                 .isInstanceOf(CannotDeleteSectionException.class)
                 .hasMessage(ErrorMessage.CANNOT_DELETE_SECTION.getMessage());
     }
@@ -107,13 +120,13 @@ class SectionsTest {
     void noLastStation() {
         // given
         Sections sections = new Sections();
-        Section firstSection = new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 10L);
+        Section firstSection = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
         sections.addSection(firstSection);
-        Section secondSection = new Section(StationFixtures.DOWN_STATION, StationFixtures.NEW_UP_STATION, 20L);
+        Section secondSection = new Section(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_UP_STATION, 20L);
         sections.addSection(secondSection);
         // when
         // then
-        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.NEW_DOWN_STATION.getId()))
+        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.SECOND_DOWN_STATION.getId()))
                 .isInstanceOf(CannotDeleteSectionException.class);
     }
 
@@ -122,12 +135,12 @@ class SectionsTest {
     void targetSection() {
         // given
         Sections sections = new Sections();
-        Section firstSection = new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 10L);
+        Section firstSection = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
         sections.addSection(firstSection);
-        Section secondSection = new Section(StationFixtures.DOWN_STATION, StationFixtures.NEW_UP_STATION, 20L);
+        Section secondSection = new Section(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_UP_STATION, 20L);
         sections.addSection(secondSection);
         // when
-        Section targetSection = sections.getDeleteTargetSection(StationFixtures.NEW_UP_STATION.getId());
+        Section targetSection = sections.getDeleteTargetSection(StationFixtures.SECOND_UP_STATION.getId());
         // then
         Assertions.assertThat(targetSection).isEqualTo(secondSection);
     }

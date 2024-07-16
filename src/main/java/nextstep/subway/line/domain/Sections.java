@@ -4,6 +4,7 @@ import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.CannotDeleteSectionException;
 import nextstep.subway.exception.NotSameUpAndDownStationException;
 import nextstep.subway.line.domain.Section;
+import nextstep.subway.station.Station;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -27,6 +28,12 @@ public class Sections {
         }
 
         throw new NotSameUpAndDownStationException(ErrorMessage.NOT_SAME_UP_AND_DOWN_STATION);
+    }
+
+    private boolean noExistBothUpAndDownStation(Section newSection) {
+        Station upStation = newSection.getUpStation();
+        Station downStation = newSection.getDownStation();
+
     }
 
     private boolean canConnectedWithNewSection(Section newSection) {

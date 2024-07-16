@@ -24,18 +24,47 @@ import org.springframework.test.context.jdbc.Sql;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
-    private long upStationId;
-    private long downStationId;
+    private long firstStationId;
+    private long secondStationId;
+    private long thirdStationId;
     private long lineId;
 
     @BeforeEach
     void setUp() {
-        this.upStationId = StationAssuredTemplate.createStation(StationFixtures.UP_STATION.getName())
+        this.firstStationId = StationAssuredTemplate.createStation(StationFixtures.FIRST_UP_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
-        this.downStationId = StationAssuredTemplate.createStation(StationFixtures.DOWN_STATION.getName())
+        this.secondStationId = StationAssuredTemplate.createStation(StationFixtures.FIRST_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
-        this.lineId = LineAssuredTemplate.createLine(new LineRequest("신분당선", "red", upStationId, downStationId, 10L))
+        this.thirdStationId =  StationAssuredTemplate.createStation(StationFixtures.SECOND_UP_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
+        this.lineId = LineAssuredTemplate.createLine(new LineRequest("신분당선", "red", firstStationId, secondStationId, 10L))
+                .then().extract().jsonPath().getLong("id");
+    }
+
+    /**
+     * Given 노선에 구간이 2개 등록되어 있습니다.(A-B, B-C)
+     * When 추가하려는 구간에 A, B, C 역이 없는 경우
+     * Then 에러 메시지를 응답받습니다.
+     */
+    @DisplayName("역을 새로 추가할 때 upStation 혹은 downStation 이 기존 구간에 없으면 에러 응답을 받습니다.")
+    @Test
+    void noExistStation() {
+        // given
+        SectionAssuredTemplate.addSection(lineId, new SectionRequest(secondStationId, thirdStationId, 20L));
+
+        long newUpStation = StationAssuredTemplate.createStation(StationFixtures.THIRD_UP_STATION.getName())
+                .then().extract().jsonPath().getLong("id");
+
+        long newDownStation = StationAssuredTemplate.createStation(StationFixtures.THIRD_DOWN_STATION.getName())
+                .then().extract().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(lineId, new SectionRequest(newUpStation, newDownStation, 30L))
+                .then().extract();
+
+        // then
+        Assertions.assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        Assertions.assertThat(result.body().asString()).isEqualTo(ErrorMessage.CANNOT_ADD_STATION.getMessage());
     }
 
     /**
@@ -47,9 +76,9 @@ public class SectionAcceptanceTest {
     @Test
     void invalidSection() {
         // given
-        long newUpStationId = StationAssuredTemplate.createStation(StationFixtures.NEW_UP_STATION.getName())
+        long newUpStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_UP_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
-        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.NEW_DOWN_STATION.getName())
+        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
         // when
@@ -73,7 +102,7 @@ public class SectionAcceptanceTest {
         // given
 
         // when
-        SectionRequest sectionRequest = new SectionRequest(downStationId, upStationId, 10L);
+        SectionRequest sectionRequest = new SectionRequest(secondStationId, firstStationId, 10L);
         ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(lineId, sectionRequest)
                 .then().log().all().extract();
 
@@ -91,11 +120,11 @@ public class SectionAcceptanceTest {
     @Test
     void addSection() {
         // given
-        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.NEW_DOWN_STATION.getName())
+        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
         // when
-        SectionRequest sectionRequest = new SectionRequest(downStationId, newDownStationId, 10L);
+        SectionRequest sectionRequest = new SectionRequest(secondStationId, newDownStationId, 10L);
         ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(lineId, sectionRequest)
                 .then().log().all().extract();
 
@@ -104,9 +133,9 @@ public class SectionAcceptanceTest {
         Assertions.assertThat(result.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(3)
                 .extracting("name")
                 .containsExactly(
-                        StationFixtures.UP_STATION.getName(),
-                        StationFixtures.DOWN_STATION.getName(),
-                        StationFixtures.NEW_DOWN_STATION.getName()
+                        StationFixtures.FIRST_UP_STATION.getName(),
+                        StationFixtures.FIRST_DOWN_STATION.getName(),
+                        StationFixtures.SECOND_DOWN_STATION.getName()
                 );
     }
 
@@ -120,7 +149,7 @@ public class SectionAcceptanceTest {
     void hasOneSection() {
         // given
         // when
-        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(lineId, downStationId)
+        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(lineId, secondStationId)
                 .then().log().all().extract();
 
         // then
@@ -137,14 +166,14 @@ public class SectionAcceptanceTest {
     @DisplayName("삭제하려는 역이 하행 종점역이 아닌 경우 삭제할 수 없습니다.")
     void notDownStation() {
         // given
-        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.NEW_DOWN_STATION.getName())
+        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
-        SectionRequest sectionRequest = new SectionRequest(downStationId, newDownStationId, 10L);
+        SectionRequest sectionRequest = new SectionRequest(secondStationId, newDownStationId, 10L);
         SectionAssuredTemplate.addSection(lineId, sectionRequest);
 
         // when
-        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(lineId, downStationId)
+        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(lineId, secondStationId)
                 .then().log().all().extract();
 
         // then
@@ -161,10 +190,10 @@ public class SectionAcceptanceTest {
     @DisplayName("정상적으로 하행 종점역 삭제가 진행됩니다.")
     void deleteStation() {
         // given
-        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.NEW_DOWN_STATION.getName())
+        long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
-        SectionRequest sectionRequest = new SectionRequest(downStationId, newDownStationId, 10L);
+        SectionRequest sectionRequest = new SectionRequest(secondStationId, newDownStationId, 10L);
         SectionAssuredTemplate.addSection(lineId, sectionRequest);
 
         // when
@@ -181,8 +210,8 @@ public class SectionAcceptanceTest {
         Assertions.assertThat(lineResult.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(2)
                 .extracting("id", "name")
                 .containsExactly(
-                        Tuple.tuple(upStationId, StationFixtures.UP_STATION.getName()),
-                        Tuple.tuple(downStationId, StationFixtures.DOWN_STATION.getName())
+                        Tuple.tuple(firstStationId, StationFixtures.FIRST_UP_STATION.getName()),
+                        Tuple.tuple(secondStationId, StationFixtures.FIRST_DOWN_STATION.getName())
                 );
     }
 }

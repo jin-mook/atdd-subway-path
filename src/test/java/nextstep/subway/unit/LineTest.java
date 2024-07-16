@@ -31,8 +31,8 @@ class LineTest {
         Assertions.assertThat(line.getSections()).hasSize(2)
                 .extracting("upStation", "downStation")
                 .containsExactly(
-                        Tuple.tuple(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION),
-                        Tuple.tuple(StationFixtures.DOWN_STATION, StationFixtures.NEW_UP_STATION)
+                        Tuple.tuple(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION),
+                        Tuple.tuple(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_UP_STATION)
                 );
     }
 
@@ -45,7 +45,7 @@ class LineTest {
         // then
         Assertions.assertThat(result).hasSize(2)
                 .extracting("name")
-                .containsExactly(StationFixtures.UP_STATION.getName(), StationFixtures.DOWN_STATION.getName());
+                .containsExactly(StationFixtures.FIRST_UP_STATION.getName(), StationFixtures.FIRST_DOWN_STATION.getName());
     }
 
     @Test
@@ -54,14 +54,14 @@ class LineTest {
         line.addSection(SectionFixtures.ADD_FIRST_SECTION);
 
         // when
-        Section targetSection = line.findDeleteTargetSection(StationFixtures.NEW_UP_STATION.getId());
+        Section targetSection = line.findDeleteTargetSection(StationFixtures.SECOND_UP_STATION.getId());
         line.deleteSection(targetSection);
 
         // then
         Assertions.assertThat(line.getSections()).hasSize(1)
                 .extracting("upStation", "downStation")
                 .containsExactly(
-                        Tuple.tuple(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION)
+                        Tuple.tuple(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION)
                 );
     }
 }

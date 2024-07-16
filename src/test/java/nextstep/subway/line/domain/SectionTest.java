@@ -3,7 +3,6 @@ package nextstep.subway.line.domain;
 import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.IllegalDistanceValueException;
 import nextstep.subway.exception.NotSameUpAndDownStationException;
-import nextstep.subway.line.domain.Section;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +16,7 @@ class SectionTest {
         // given
         // when
         // then
-        Assertions.assertThatThrownBy(() -> new Section(StationFixtures.UP_STATION, StationFixtures.DOWN_STATION, 0L))
+        Assertions.assertThatThrownBy(() -> new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 0L))
                 .isInstanceOf(IllegalDistanceValueException.class)
                 .hasMessage(ErrorMessage.ILLEGAL_DISTANCE_VALUE.getMessage());
     }
@@ -28,7 +27,7 @@ class SectionTest {
         // given
         // when
         // then
-        Assertions.assertThatThrownBy(() -> new Section(StationFixtures.UP_STATION, StationFixtures.UP_STATION, 10L))
+        Assertions.assertThatThrownBy(() -> new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_UP_STATION, 10L))
                 .isInstanceOf(NotSameUpAndDownStationException.class);
     }
 }

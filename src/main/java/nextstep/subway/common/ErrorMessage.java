@@ -9,7 +9,8 @@ public enum ErrorMessage {
     NO_LINE_EXIST("해당하는 지하철 노선 정보가 없습니다."),
     NO_STATION_EXIST("해당하는 지하철 역 정보가 없습니다."),
     NOT_SAME_UP_AND_DOWN_STATION("구간 정보가 올바르지 않습니다."),
-    ILLEGAL_DISTANCE_VALUE("거리 간격이 0 이하일 수 없습니다.");
+    ILLEGAL_DISTANCE_VALUE("거리 간격이 0 이하일 수 없습니다."),
+    CANNOT_ADD_STATION("새로운 역을 추가할 수 없습니다.");
 
     private final String message;
 

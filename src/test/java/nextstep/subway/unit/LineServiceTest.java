@@ -30,16 +30,16 @@ public class LineServiceTest {
     void addSection() {
         // given
         // stationRepository와 lineRepository를 활용하여 초기값 셋팅
-        Station upStation = stationRepository.save(StationFixtures.UP_STATION);
-        Station downStation = stationRepository.save(StationFixtures.DOWN_STATION);
-        stationRepository.save(StationFixtures.NEW_UP_STATION);
+        Station upStation = stationRepository.save(StationFixtures.FIRST_UP_STATION);
+        Station downStation = stationRepository.save(StationFixtures.FIRST_DOWN_STATION);
+        stationRepository.save(StationFixtures.SECOND_UP_STATION);
         Section section = new Section(upStation, downStation, 10L);
         Line line = new Line("2호선", "green", section);
         Line savedLine = lineRepository.save(line);
 
         // when
         // lineService.addSection 호출
-        LineResponse lineResponse = lineService.addSection(savedLine.getId(), new SectionRequest(StationFixtures.DOWN_STATION.getId(), StationFixtures.NEW_UP_STATION.getId(), 20L));
+        LineResponse lineResponse = lineService.addSection(savedLine.getId(), new SectionRequest(StationFixtures.FIRST_DOWN_STATION.getId(), StationFixtures.SECOND_UP_STATION.getId(), 20L));
 
         // then
         // line.getSections 메서드를 통해 검증
