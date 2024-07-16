@@ -1,8 +1,9 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.ErrorMessage;
-import nextstep.subway.exception.*;
-import nextstep.subway.station.Station;
+import nextstep.subway.exception.AlreadyHasUpAndDownStationException;
+import nextstep.subway.exception.CannotDeleteSectionException;
+import nextstep.subway.exception.NoStationException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -11,9 +12,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Embeddable
 public class Sections {

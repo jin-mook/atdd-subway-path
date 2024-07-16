@@ -88,7 +88,7 @@ public class SectionAcceptanceTest {
 
         // then
         Assertions.assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        Assertions.assertThat(result.body().asString()).isEqualTo(ErrorMessage.NOT_SAME_UP_AND_DOWN_STATION.getMessage());
+        Assertions.assertThat(result.body().asString()).isEqualTo(ErrorMessage.CANNOT_ADD_STATION.getMessage());
     }
 
     /**
@@ -108,7 +108,7 @@ public class SectionAcceptanceTest {
 
         // then
         Assertions.assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        Assertions.assertThat(result.body().asString()).isEqualTo(ErrorMessage.NOT_SAME_UP_AND_DOWN_STATION.getMessage());
+        Assertions.assertThat(result.body().asString()).isEqualTo(ErrorMessage.CANNOT_ADD_STATION.getMessage());
     }
 
     /**
@@ -116,6 +116,7 @@ public class SectionAcceptanceTest {
      * When 해당 노선에 신규 구간을 추가합니다.
      * Then 추가된 신규 구간이 정상적으로 응답으로 보입니다.
      */
+    // TODO: 7/17/24 좀 더 다양한 케이스에서 성공하는지 확인해야함, 특히 응답의 순서에 주의할 필요 있음
     @DisplayName("새로운 구간을 등록합니다.")
     @Test
     void addSection() {

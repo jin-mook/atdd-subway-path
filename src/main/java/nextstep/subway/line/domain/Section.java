@@ -53,21 +53,9 @@ public class Section {
         return upStation.equals(station) || downStation.equals(station);
     }
 
-//    public Station getUpStation() {
-//        return upStation;
-//    }
-
-//    public Station getDownStation() {
-//        return downStation;
-//    }
-
     public void setMappingWithLine(Line line) {
         this.line = line;
     }
-
-//    public Long getDistance() {
-//        return this.distance;
-//    }
 
     public void decreaseDistance(Long distance) {
         if (this.distance <= distance) {

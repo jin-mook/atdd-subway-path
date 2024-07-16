@@ -1,10 +1,7 @@
 package nextstep.subway;
 
 import nextstep.subway.common.ErrorResponse;
-import nextstep.subway.exception.CannotDeleteSectionException;
-import nextstep.subway.exception.NoLineExistException;
-import nextstep.subway.exception.NoStationException;
-import nextstep.subway.exception.NotSameUpAndDownStationException;
+import nextstep.subway.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,7 +14,7 @@ public class GlobalExceptionHandler {
         return ErrorResponse.badRequest(exception.getMessage());
     }
 
-    @ExceptionHandler({NoStationException.class, NotSameUpAndDownStationException.class})
+    @ExceptionHandler({NoStationException.class, NotSameUpAndDownStationException.class, AlreadyHasUpAndDownStationException.class})
     public ResponseEntity<String> stationException(Exception exception) {
         return ErrorResponse.badRequest(exception.getMessage());
     }
