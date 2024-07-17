@@ -114,30 +114,48 @@ public class SectionAcceptanceTest {
     /**
      * Given 노선에 구간이 하나 등록되어 있습니다.
      * When 해당 노선에 신규 구간을 추가합니다.
-     * Then 추가된 신규 구간이 정상적으로 응답으로 보입니다.
+     * Then 노선 조회 시 추가된 신규 구간이 정상적으로 응답으로 보입니다.
      */
     // TODO: 7/17/24 좀 더 다양한 케이스에서 성공하는지 확인해야함, 특히 응답의 순서에 주의할 필요 있음
     @DisplayName("새로운 구간을 등록합니다.")
     @Test
     void addSection() {
         // given
+        SectionAssuredTemplate.addSection(lineId, new SectionRequest(secondStationId, thirdStationId, 10L));
         long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
+        long newUpStationId = StationAssuredTemplate.createStation(StationFixtures.THIRD_UP_STATION.getName())
+                .then().extract().jsonPath().getLong("id");
+
         // when
-        SectionRequest sectionRequest = new SectionRequest(secondStationId, newDownStationId, 10L);
-        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(lineId, sectionRequest)
-                .then().log().all().extract();
+        // 1. upStation 기준으로 구간 추가
+        SectionAssuredTemplate.addSection(lineId, new SectionRequest(secondStationId, newDownStationId, 3L));
+
+        // 2. downStation 기준으로 구간 추가
+        SectionAssuredTemplate.addSection(lineId, new SectionRequest(newUpStationId, firstStationId, 20L));
 
         // then
-        Assertions.assertThat(result.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        Assertions.assertThat(result.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(3)
+        ExtractableResponse<Response> result = LineAssuredTemplate.searchOneLine(lineId)
+                .then().log().all().extract();
+
+        Assertions.assertThat(result.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(5)
                 .extracting("name")
                 .containsExactly(
+                        StationFixtures.THIRD_UP_STATION.getName(),
                         StationFixtures.FIRST_UP_STATION.getName(),
                         StationFixtures.FIRST_DOWN_STATION.getName(),
-                        StationFixtures.SECOND_DOWN_STATION.getName()
+                        StationFixtures.SECOND_DOWN_STATION.getName(),
+                        StationFixtures.SECOND_UP_STATION.getName()
                 );
+//        Assertions.assertThat(result.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+//        Assertions.assertThat(result.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(3)
+//                .extracting("name")
+//                .containsExactly(
+//                        StationFixtures.FIRST_UP_STATION.getName(),
+//                        StationFixtures.FIRST_DOWN_STATION.getName(),
+//                        StationFixtures.SECOND_DOWN_STATION.getName()
+//                );
     }
 
     /**

@@ -70,18 +70,6 @@ public class Sections {
         }
     }
 
-    private boolean canConnectedWithNewSection(Section newSection) {
-        Section lastSection = getLastSection();
-
-        return lastSection.isDownStationSameWithNewUpStation(newSection)
-                && !alreadyHasNewDownStation(newSection);
-    }
-
-    private boolean alreadyHasNewDownStation(Section newSection) {
-        return sections.stream()
-                .anyMatch(section -> section.containStation(newSection.getDownStation()));
-    }
-
     public List<Section> getSections() {
         return Collections.unmodifiableList(sections);
     }
