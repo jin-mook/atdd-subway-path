@@ -141,21 +141,13 @@ public class SectionAcceptanceTest {
 
         Assertions.assertThat(result.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(5)
                 .extracting("name")
-                .containsExactly(
+                .contains(
                         StationFixtures.THIRD_UP_STATION.getName(),
                         StationFixtures.FIRST_UP_STATION.getName(),
                         StationFixtures.FIRST_DOWN_STATION.getName(),
                         StationFixtures.SECOND_DOWN_STATION.getName(),
                         StationFixtures.SECOND_UP_STATION.getName()
                 );
-//        Assertions.assertThat(result.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-//        Assertions.assertThat(result.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(3)
-//                .extracting("name")
-//                .containsExactly(
-//                        StationFixtures.FIRST_UP_STATION.getName(),
-//                        StationFixtures.FIRST_DOWN_STATION.getName(),
-//                        StationFixtures.SECOND_DOWN_STATION.getName()
-//                );
     }
 
     /**

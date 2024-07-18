@@ -33,18 +33,21 @@ public class Sections {
         List<Section> downSections = sections.stream().filter(section -> section.containStation(newSection.getDownStation()))
                 .collect(Collectors.toList());
 
+        // 새로 추가하려는 구간의 역이 기존 노선에 존재하지 않는 경우
         if (upSections.isEmpty() && downSections.isEmpty()) {
             throw new NoStationException(ErrorMessage.CANNOT_ADD_STATION);
         }
 
+        // 새로 추가하려는 구간의 상행역과 하행역이 기존 노선에 모두 존재하는 경우
         if (!upSections.isEmpty() && !downSections.isEmpty()) {
             throw new AlreadyHasUpAndDownStationException(ErrorMessage.CANNOT_ADD_STATION);
         }
 
+        // 상행역을 기준으로 추가하는 경우
         if (!upSections.isEmpty()) {
             for (int i = 0; i < sections.size(); i++) {
                 Section section = sections.get(i);
-                if (section.getUpStation().equals(newSection.getUpStation())) {
+                if (isAddToUpStation(newSection, section)) {
                     // 로직
                     sections.add(i, newSection);
                     section.decreaseDistance(newSection.getDistance());
@@ -56,10 +59,11 @@ public class Sections {
             sections.add(newSection);
         }
 
+        // 하행역을 기준으로 추가하는 경우
         if (!downSections.isEmpty()) {
             for (int i = 0; i < sections.size(); i++) {
                 Section section = sections.get(i);
-                if (section.getDownStation().equals(newSection.getDownStation())) {
+                if (isAddToDownStation(newSection, section)) {
                     sections.add(i+1, newSection);
                     section.decreaseDistance(newSection.getDistance());
                     section.changeDownStation(newSection.getUpStation());
@@ -68,6 +72,14 @@ public class Sections {
             }
             sections.add(0, newSection);
         }
+    }
+
+    private boolean isAddToUpStation(Section newSection, Section section) {
+        return section.getUpStation().equals(newSection.getUpStation());
+    }
+
+    private boolean isAddToDownStation(Section newSection, Section section) {
+        return section.getDownStation().equals(newSection.getDownStation());
     }
 
     public List<Section> getSections() {
