@@ -24,20 +24,20 @@ import org.springframework.test.context.jdbc.Sql;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
-    private long firstStationId;
-    private long secondStationId;
-    private long thirdStationId;
-    private long lineId;
+    private long 강남역_id;
+    private long 역삼역_id;
+    private long 선릉역_id;
+    private long 이호선_id;
 
     @BeforeEach
     void setUp() {
-        this.firstStationId = StationAssuredTemplate.createStation(StationFixtures.FIRST_UP_STATION.getName())
+        this.강남역_id = StationAssuredTemplate.createStation(StationFixtures.FIRST_UP_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
-        this.secondStationId = StationAssuredTemplate.createStation(StationFixtures.FIRST_DOWN_STATION.getName())
+        this.역삼역_id = StationAssuredTemplate.createStation(StationFixtures.FIRST_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
-        this.thirdStationId =  StationAssuredTemplate.createStation(StationFixtures.SECOND_UP_STATION.getName())
+        this.선릉역_id =  StationAssuredTemplate.createStation(StationFixtures.SECOND_UP_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
-        this.lineId = LineAssuredTemplate.createLine(new LineRequest("신분당선", "red", firstStationId, secondStationId, 10L))
+        this.이호선_id = LineAssuredTemplate.createLine(new LineRequest("신분당선", "red", 강남역_id, 역삼역_id, 10L))
                 .then().extract().jsonPath().getLong("id");
     }
 
@@ -50,7 +50,7 @@ public class SectionAcceptanceTest {
     @Test
     void noExistStation() {
         // given
-        SectionAssuredTemplate.addSection(lineId, new SectionRequest(secondStationId, thirdStationId, 20L));
+        SectionAssuredTemplate.addSection(이호선_id, new SectionRequest(역삼역_id, 선릉역_id, 20L));
 
         long newUpStation = StationAssuredTemplate.createStation(StationFixtures.THIRD_UP_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
@@ -59,7 +59,7 @@ public class SectionAcceptanceTest {
                 .then().extract().jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(lineId, new SectionRequest(newUpStation, newDownStation, 30L))
+        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(이호선_id, new SectionRequest(newUpStation, newDownStation, 30L))
                 .then().extract();
 
         // then
@@ -83,7 +83,7 @@ public class SectionAcceptanceTest {
 
         // when
         SectionRequest sectionRequest = new SectionRequest(newUpStationId, newDownStationId, 10L);
-        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(lineId, sectionRequest)
+        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(이호선_id, sectionRequest)
                 .then().log().all().extract();
 
         // then
@@ -102,8 +102,8 @@ public class SectionAcceptanceTest {
         // given
 
         // when
-        SectionRequest sectionRequest = new SectionRequest(secondStationId, firstStationId, 10L);
-        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(lineId, sectionRequest)
+        SectionRequest sectionRequest = new SectionRequest(역삼역_id, 강남역_id, 10L);
+        ExtractableResponse<Response> result = SectionAssuredTemplate.addSection(이호선_id, sectionRequest)
                 .then().log().all().extract();
 
         // then
@@ -121,7 +121,7 @@ public class SectionAcceptanceTest {
     @Test
     void addSection() {
         // given
-        SectionAssuredTemplate.addSection(lineId, new SectionRequest(secondStationId, thirdStationId, 10L));
+        SectionAssuredTemplate.addSection(이호선_id, new SectionRequest(역삼역_id, 선릉역_id, 10L));
         long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
@@ -130,13 +130,13 @@ public class SectionAcceptanceTest {
 
         // when
         // 1. upStation 기준으로 구간 추가
-        SectionAssuredTemplate.addSection(lineId, new SectionRequest(secondStationId, newDownStationId, 3L));
+        SectionAssuredTemplate.addSection(이호선_id, new SectionRequest(역삼역_id, newDownStationId, 3L));
 
         // 2. downStation 기준으로 구간 추가
-        SectionAssuredTemplate.addSection(lineId, new SectionRequest(newUpStationId, firstStationId, 20L));
+        SectionAssuredTemplate.addSection(이호선_id, new SectionRequest(newUpStationId, 강남역_id, 20L));
 
         // then
-        ExtractableResponse<Response> result = LineAssuredTemplate.searchOneLine(lineId)
+        ExtractableResponse<Response> result = LineAssuredTemplate.searchOneLine(이호선_id)
                 .then().log().all().extract();
 
         Assertions.assertThat(result.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(5)
@@ -160,7 +160,7 @@ public class SectionAcceptanceTest {
     void hasOneSection() {
         // given
         // when
-        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(lineId, secondStationId)
+        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(이호선_id, 역삼역_id)
                 .then().log().all().extract();
 
         // then
@@ -180,11 +180,11 @@ public class SectionAcceptanceTest {
         long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
-        SectionRequest sectionRequest = new SectionRequest(secondStationId, newDownStationId, 10L);
-        SectionAssuredTemplate.addSection(lineId, sectionRequest);
+        SectionRequest sectionRequest = new SectionRequest(역삼역_id, newDownStationId, 10L);
+        SectionAssuredTemplate.addSection(이호선_id, sectionRequest);
 
         // when
-        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(lineId, secondStationId)
+        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(이호선_id, 역삼역_id)
                 .then().log().all().extract();
 
         // then
@@ -204,25 +204,25 @@ public class SectionAcceptanceTest {
         long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
                 .then().extract().jsonPath().getLong("id");
 
-        SectionRequest sectionRequest = new SectionRequest(secondStationId, newDownStationId, 10L);
-        SectionAssuredTemplate.addSection(lineId, sectionRequest);
+        SectionRequest sectionRequest = new SectionRequest(역삼역_id, newDownStationId, 10L);
+        SectionAssuredTemplate.addSection(이호선_id, sectionRequest);
 
         // when
-        ExtractableResponse<Response> deleteResult = SectionAssuredTemplate.deleteSection(lineId, newDownStationId)
+        ExtractableResponse<Response> deleteResult = SectionAssuredTemplate.deleteSection(이호선_id, newDownStationId)
                 .then().log().all().extract();
 
         Assertions.assertThat(deleteResult.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        ExtractableResponse<Response> lineResult = LineAssuredTemplate.searchOneLine(lineId)
+        ExtractableResponse<Response> lineResult = LineAssuredTemplate.searchOneLine(이호선_id)
                 .then().log().all().extract();
 
         Assertions.assertThat(lineResult.statusCode()).isEqualTo(HttpStatus.OK.value());
         Assertions.assertThat(lineResult.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(2)
                 .extracting("id", "name")
                 .containsExactly(
-                        Tuple.tuple(firstStationId, StationFixtures.FIRST_UP_STATION.getName()),
-                        Tuple.tuple(secondStationId, StationFixtures.FIRST_DOWN_STATION.getName())
+                        Tuple.tuple(강남역_id, StationFixtures.FIRST_UP_STATION.getName()),
+                        Tuple.tuple(역삼역_id, StationFixtures.FIRST_DOWN_STATION.getName())
                 );
     }
 }
