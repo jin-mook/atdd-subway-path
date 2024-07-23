@@ -37,18 +37,6 @@ class LineTest {
     }
 
     @Test
-    void getStations() {
-        // given
-        // when
-        List<Station> result = line.getStations();
-
-        // then
-        Assertions.assertThat(result).hasSize(2)
-                .extracting("name")
-                .containsExactly(StationFixtures.FIRST_UP_STATION.getName(), StationFixtures.FIRST_DOWN_STATION.getName());
-    }
-
-    @Test
     void removeSection() {
         // given
         line.addSection(SectionFixtures.ADD_FIRST_SECTION);

@@ -54,17 +54,6 @@ public class Line {
         this.color = newColor;
     }
 
-    public <R> List<R> mapSectionStations(Function<Station, R> mapper) {
-        return sections.getSections().stream()
-                .flatMap(section -> Stream.of(mapper.apply(section.getUpStation()), mapper.apply(section.getDownStation())))
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    public List<Station> getStations() {
-        return mapSectionStations(station -> station);
-    }
-
     public List<Section> getSections() {
         return sections.getSections();
     }
