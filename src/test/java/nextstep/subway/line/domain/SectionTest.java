@@ -7,6 +7,8 @@ import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class SectionTest {
 
@@ -29,5 +31,17 @@ class SectionTest {
         // then
         Assertions.assertThatThrownBy(() -> new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_UP_STATION, 10L))
                 .isInstanceOf(NotSameUpAndDownStationException.class);
+    }
+
+    @ParameterizedTest(name = "기존 Section 의 구간 길이 이상으로 구간을 줄일 수 없습니다.")
+    @ValueSource(longs = {5, 6})
+    void decreaseDistanceBig(long distance) {
+        // given
+        Section section = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 5L);
+        // when
+        // then
+        Assertions.assertThatThrownBy(() -> section.decreaseDistance(distance))
+                .isInstanceOf(IllegalDistanceValueException.class)
+                .hasMessage(ErrorMessage.LARGE_DISTANCE_THAN_CURRENT_SECTION.getMessage());
     }
 }

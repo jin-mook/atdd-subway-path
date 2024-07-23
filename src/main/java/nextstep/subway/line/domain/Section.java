@@ -22,11 +22,11 @@ public class Section {
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "up_station_id")
     private Station upStation;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
@@ -43,10 +43,6 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
-    }
-
-    public boolean isDownStationSameWithNewUpStation(Section section) {
-        return this.downStation.equals(section.getUpStation());
     }
 
     public boolean containStation(Station station) {
