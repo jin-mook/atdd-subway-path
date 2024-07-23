@@ -3,14 +3,11 @@ package nextstep.subway.unit;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.SectionFixtures;
-import nextstep.subway.station.Station;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 class LineTest {
 
@@ -42,7 +39,7 @@ class LineTest {
         line.addSection(SectionFixtures.ADD_FIRST_SECTION);
 
         // when
-        Section targetSection = line.findDeleteTargetSection(StationFixtures.SECOND_UP_STATION.getId());
+        Section targetSection = line.findDeleteTargetSectionByStationId(StationFixtures.SECOND_UP_STATION.getId());
         line.deleteSection(targetSection);
 
         // then

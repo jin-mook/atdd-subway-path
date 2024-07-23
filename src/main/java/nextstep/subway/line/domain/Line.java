@@ -3,13 +3,9 @@ package nextstep.subway.line.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.station.Station;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Getter
 @Entity
@@ -38,7 +34,7 @@ public class Line {
         section.setMappingWithLine(this);
     }
 
-    public Section findDeleteTargetSection(Long stationId) {
+    public Section findDeleteTargetSectionByStationId(Long stationId) {
         return sections.getDeleteTargetSection(stationId);
     }
 
