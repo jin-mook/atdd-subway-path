@@ -86,8 +86,12 @@ public class LineService {
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineByIdWithSectionsAndStations(lineId);
 
-        Section targetSection = line.findDeleteTargetSectionByStationId(stationId);
-        line.deleteSection(targetSection);
+        Station station = stationService.findById(stationId);
+
+//        Section targetSection = line.findDeleteTargetSectionByStationId(stationId);
+//        line.deleteSection(targetSection);
+
+        line.deleteSection(station);
     }
 
     private Line findLineByIdWithSectionsAndStations(Long lineId) {

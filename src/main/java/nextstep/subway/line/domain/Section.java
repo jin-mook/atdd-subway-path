@@ -34,7 +34,16 @@ public class Section {
 
     private Long distance;
 
+    // TODO: 7/25/24 Section 의 생명 주기를 Line으로 통합할 수 있을것 같음...
     public Section(Station upStation, Station downStation, Long distance) {
+        this(1, upStation, downStation, distance);
+    }
+
+    public Section(Integer lineOrder, Station upStation, Station downStation, Long distance) {
+        this(null, lineOrder, upStation, downStation, distance);
+    }
+
+    private Section(Line line, Integer lineOrder, Station upStation, Station downStation, Long distance) {
         if (upStation.equals(downStation)) {
             throw new NotSameUpAndDownStationException(ErrorMessage.NOT_SAME_UP_AND_DOWN_STATION);
         }
@@ -42,23 +51,21 @@ public class Section {
             throw new IllegalDistanceValueException(ErrorMessage.ILLEGAL_DISTANCE_VALUE);
         }
 
+        this.line = line;
+        this.lineOrder = lineOrder;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Section(Integer lineOrder, Station upStation, Station downStation, Long distance) {
-        if (upStation.equals(downStation)) {
-            throw new NotSameUpAndDownStationException(ErrorMessage.NOT_SAME_UP_AND_DOWN_STATION);
-        }
-        if (distance <= 0) {
-            throw new IllegalDistanceValueException(ErrorMessage.ILLEGAL_DISTANCE_VALUE);
-        }
-
-        this.lineOrder = lineOrder;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+    public static Section joinSections(Section upSection, Section downSection) {
+        return new Section(
+                upSection.getLine(),
+                upSection.getLineOrder(),
+                upSection.getUpStation(),
+                downSection.getDownStation(),
+                upSection.distance + downSection.distance
+        );
     }
 
     public boolean containStation(Station station) {
@@ -100,6 +107,12 @@ public class Section {
     public void addOneOrder(Section section) {
         if (this.lineOrder >= section.lineOrder) {
             this.lineOrder ++;
+        }
+    }
+
+    public void minusOneOrder(Section section) {
+        if (this.lineOrder > section.lineOrder) {
+            this.lineOrder--;
         }
     }
 }

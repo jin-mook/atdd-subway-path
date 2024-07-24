@@ -4,6 +4,7 @@ import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.*;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -190,7 +191,7 @@ class SectionsTest {
         Sections sections = new Sections();
         // when
         // then
-        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.FIRST_DOWN_STATION.getId()))
+        Assertions.assertThatThrownBy(() -> sections.deleteSection(StationFixtures.FIRST_DOWN_STATION))
                 .isInstanceOf(CannotDeleteSectionException.class)
                 .hasMessage(ErrorMessage.CANNOT_DELETE_SECTION.getMessage());
     }
@@ -204,13 +205,30 @@ class SectionsTest {
         sections.addSection(section);
         // when
         // then
-        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.FIRST_DOWN_STATION.getId()))
+        Assertions.assertThatThrownBy(() -> sections.deleteSection(StationFixtures.FIRST_DOWN_STATION))
                 .isInstanceOf(CannotDeleteSectionException.class)
                 .hasMessage(ErrorMessage.CANNOT_DELETE_SECTION.getMessage());
     }
 
+    @DisplayName("전달받은 역 정보가 상행역이라면 정상적으로 삭제합니다.")
     @Test
-    @DisplayName("전달받은 역 정보가 마지막 구간의 하행역이 아닌경우 에러가 발생합니다.")
+    void upStationDelete() {
+        // given
+        Sections sections = new Sections();
+        Section firstSection = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 10L);
+        sections.addSection(firstSection);
+        Section secondSection = new Section(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_UP_STATION, 20L);
+        sections.addSection(secondSection);
+        // when
+        sections.deleteSection(StationFixtures.FIRST_UP_STATION);
+        // then
+        Assertions.assertThat(sections.getSections()).hasSize(1)
+                .contains(secondSection);
+        Assertions.assertThat(secondSection.getLineOrder()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("전달받은 역 정보가 마지막 구간에 존재하는 경우 삭제합니다.")
     void noLastStation() {
         // given
         Sections sections = new Sections();
@@ -219,13 +237,15 @@ class SectionsTest {
         Section secondSection = new Section(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_UP_STATION, 20L);
         sections.addSection(secondSection);
         // when
+        sections.deleteSection(StationFixtures.SECOND_UP_STATION);
         // then
-        Assertions.assertThatThrownBy(() -> sections.getDeleteTargetSection(StationFixtures.SECOND_DOWN_STATION.getId()))
-                .isInstanceOf(CannotDeleteSectionException.class);
+        Assertions.assertThat(sections.getSections()).hasSize(1)
+                .contains(firstSection);
+        Assertions.assertThat(firstSection.getLineOrder()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("전달받은 역 정보가 2개 이상의 구간의 마지막 하행역인 경우 해당 구간을 전달합니다.")
+    @DisplayName("전달받은 역 정보가 2개 이상의 구간에 존재하는 경우 정상적으로 역을 삭제합니다.")
     void targetSection() {
         // given
         Sections sections = new Sections();
@@ -234,8 +254,12 @@ class SectionsTest {
         Section secondSection = new Section(StationFixtures.FIRST_DOWN_STATION, StationFixtures.SECOND_UP_STATION, 20L);
         sections.addSection(secondSection);
         // when
-        Section targetSection = sections.getDeleteTargetSection(StationFixtures.SECOND_UP_STATION.getId());
+        sections.deleteSection(StationFixtures.FIRST_DOWN_STATION);
         // then
-        Assertions.assertThat(targetSection).isEqualTo(secondSection);
+        Assertions.assertThat(sections.getSections()).hasSize(1)
+                .extracting("lineOrder", "upStation", "downStation", "distance")
+                .contains(
+                        Tuple.tuple(1, StationFixtures.FIRST_UP_STATION, StationFixtures.SECOND_UP_STATION, 30L)
+                );
     }
 }

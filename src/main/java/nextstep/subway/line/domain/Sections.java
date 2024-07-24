@@ -11,6 +11,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
@@ -96,24 +97,47 @@ public class Sections {
         return Collections.unmodifiableList(sections);
     }
 
-    public Section getDeleteTargetSection(Long stationId) {
+    public void deleteSection(Station station) {
         if (sections.size() <= 1) {
             throw new CannotDeleteSectionException(ErrorMessage.CANNOT_DELETE_SECTION);
         }
 
-        if (!isLastStation(stationId)) {
-            throw new CannotDeleteSectionException(ErrorMessage.CANNOT_DELETE_SECTION);
+        List<Section> targetSections = sections.stream().filter(section -> section.containStation(station))
+                .collect(Collectors.toList());
+
+        if (targetSections.isEmpty()) {
+            throw new CannotDeleteSectionException(ErrorMessage.NO_STATION_EXIST);
         }
 
-        return getLastSection();
+        // 노선에 존재하는 상행역, 하행역을 삭제하는 경우
+        if (isFirstStationOrLastStation(targetSections)) {
+            Section section = targetSections.get(0);
+            deleteExistSection(section);
+            return;
+        }
+
+        // 노선 중간에 존재하는 역을 삭제하는 경우
+        deleteMiddleStation(targetSections);
     }
 
-    public void deleteSection(Section section) {
+    private void deleteMiddleStation(List<Section> targetSections) {
+        Section upSection = targetSections.get(0);
+        Section downSection = targetSections.get(1);
+
+        Section newSection = Section.joinSections(upSection, downSection);
+
+        deleteExistSection(upSection);
+        deleteExistSection(downSection);
+        addNewSection(newSection);
+    }
+
+    private boolean isFirstStationOrLastStation(List<Section> targetSections) {
+        return targetSections.size() == 1;
+    }
+
+    private void deleteExistSection(Section section) {
         sections.remove(section);
-    }
-
-    private boolean isLastStation(Long stationId) {
-        return getLastSection().getDownStation().getId().equals(stationId);
+        sections.forEach(existSection -> existSection.minusOneOrder(section));
     }
 
     private Section getLastSection() {
