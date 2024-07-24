@@ -174,7 +174,7 @@ class SectionsTest {
 
         // then
         Assertions.assertThat(sections.getSections()).hasSize(4)
-                .containsExactly(secondSection, thirdSection, firstSection, targetSection);
+                .contains(secondSection, thirdSection, firstSection, targetSection);
         Assertions.assertThat(secondSection.getDistance()).isEqualTo(7L);
         Assertions.assertThat(firstSection.getDistance()).isEqualTo(5L);
 

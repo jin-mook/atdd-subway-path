@@ -22,6 +22,8 @@ public class Section {
     @JoinColumn(name = "line_id")
     private Line line;
 
+    private Integer lineOrder;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "up_station_id")
     private Station upStation;
@@ -40,6 +42,20 @@ public class Section {
             throw new IllegalDistanceValueException(ErrorMessage.ILLEGAL_DISTANCE_VALUE);
         }
 
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public Section(Integer lineOrder, Station upStation, Station downStation, Long distance) {
+        if (upStation.equals(downStation)) {
+            throw new NotSameUpAndDownStationException(ErrorMessage.NOT_SAME_UP_AND_DOWN_STATION);
+        }
+        if (distance <= 0) {
+            throw new IllegalDistanceValueException(ErrorMessage.ILLEGAL_DISTANCE_VALUE);
+        }
+
+        this.lineOrder = lineOrder;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -67,5 +83,23 @@ public class Section {
 
     public void changeDownStation(Station station) {
         this.downStation = station;
+    }
+
+    public void setFirstSectionOrder() {
+        this.lineOrder = 1;
+    }
+
+    public void setOrderFrontSection(Section section) {
+        this.lineOrder = section.getLineOrder();
+    }
+
+    public void setOrderBehindSection(Section section) {
+        this.lineOrder = section.getLineOrder() + 1;
+    }
+
+    public void addOneOrder(Section section) {
+        if (this.lineOrder >= section.lineOrder) {
+            this.lineOrder ++;
+        }
     }
 }

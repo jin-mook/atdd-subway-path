@@ -4,16 +4,13 @@ import nextstep.subway.common.ErrorMessage;
 import nextstep.subway.exception.AlreadyHasUpAndDownStationException;
 import nextstep.subway.exception.CannotDeleteSectionException;
 import nextstep.subway.exception.NoStationException;
+import nextstep.subway.station.Station;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Embeddable
 public class Sections {
@@ -24,54 +21,67 @@ public class Sections {
 
     public void addSection(Section newSection) {
         if (sections.isEmpty()) {
+            newSection.setFirstSectionOrder();
             sections.add(newSection);
             return;
         }
 
-        List<Section> upSections = sections.stream().filter(section -> section.containStation(newSection.getUpStation()))
-                .collect(Collectors.toList());
+        Optional<Section> upSection = findExistUpStationSection(newSection);
+        Optional<Section> downSection = findExistDownStationSection(newSection);
 
-        List<Section> downSections = sections.stream().filter(section -> section.containStation(newSection.getDownStation()))
-                .collect(Collectors.toList());
-
-        // 새로 추가하려는 구간의 역이 기존 노선에 존재하지 않는 경우
-        if (upSections.isEmpty() && downSections.isEmpty()) {
+        if (upSection.isEmpty() && downSection.isEmpty()) {
             throw new NoStationException(ErrorMessage.CANNOT_ADD_STATION);
         }
 
-        // 새로 추가하려는 구간의 상행역과 하행역이 기존 노선에 모두 존재하는 경우
-        if (!upSections.isEmpty() && !downSections.isEmpty()) {
+        if (upSection.isPresent() && downSection.isPresent()) {
             throw new AlreadyHasUpAndDownStationException(ErrorMessage.CANNOT_ADD_STATION);
         }
 
-        // 상행역을 기준으로 추가하는 경우
-        if (!upSections.isEmpty()) {
-            for (int i = 0; i < sections.size(); i++) {
-                Section section = sections.get(i);
-                if (isAddToUpStation(newSection, section)) {
-                    // 로직
-                    sections.add(i, newSection);
-                    section.decreaseDistance(newSection.getDistance());
-                    section.changeUpStation(newSection.getDownStation());
-                    return;
-                }
+        if (upSection.isPresent()) {
+            Section section = upSection.get();
+            if (isAddToUpStation(newSection, section)) {
+                newSection.setOrderFrontSection(section);
+
+                section.decreaseDistance(newSection.getDistance());
+                section.changeUpStation(newSection.getDownStation());
+            } else {
+                Section lastSection = getLastSection();
+                newSection.setOrderBehindSection(lastSection);
             }
-            sections.add(newSection);
+            addNewSection(newSection);
         }
 
-        // 하행역을 기준으로 추가하는 경우
-        if (!downSections.isEmpty()) {
-            for (int i = 0; i < sections.size(); i++) {
-                Section section = sections.get(i);
-                if (isAddToDownStation(newSection, section)) {
-                    sections.add(i+1, newSection);
-                    section.decreaseDistance(newSection.getDistance());
-                    section.changeDownStation(newSection.getUpStation());
-                    return;
-                }
+        if (downSection.isPresent()) {
+            Section section = downSection.get();
+            if (isAddToDownStation(newSection, section)) {
+                newSection.setOrderBehindSection(section);
+
+                section.decreaseDistance(newSection.getDistance());
+                section.changeDownStation(newSection.getUpStation());
+            } else {
+                Section firstSection = getFirstSection();
+                newSection.setOrderFrontSection(firstSection);
             }
-            sections.add(0, newSection);
+            addNewSection(newSection);
         }
+    }
+
+    private Optional<Section> findExistUpStationSection(Section section) {
+        return sections.stream()
+                .filter(existSection -> existSection.containStation(section.getUpStation()))
+                .reduce((first, second) -> second);
+    }
+
+    private Optional<Section> findExistDownStationSection(Section section) {
+        return sections.stream()
+                .filter(existSection -> existSection.containStation(section.getDownStation()))
+                .reduce((first, second) -> first);
+    }
+
+    private void addNewSection(Section newSection) {
+        sections.forEach(currentSection -> currentSection.addOneOrder(newSection));
+        sections.add(newSection);
+        sections.sort(Comparator.comparingInt(Section::getLineOrder));
     }
 
     private boolean isAddToUpStation(Section newSection, Section section) {
@@ -108,5 +118,9 @@ public class Sections {
 
     private Section getLastSection() {
         return sections.get(sections.size() - 1);
+    }
+
+    private Section getFirstSection() {
+        return sections.get(0);
     }
 }
