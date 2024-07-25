@@ -171,10 +171,10 @@ public class SectionAcceptanceTest {
     /**
      * Given 노선에 구간이 2개 등록되어 있습니다.
      * When 노선의 중간 역에 대해 삭제 요청을 보냅니다.
-     * Then 삭제에 실패하고 실패 응답을 전달받습니다.
+     * Then 노선 정보를 요청하면 중간 역이 정상 삭제된 것을 확인할 수 있습니다.
      */
     @Test
-    @DisplayName("삭제하려는 역이 하행 종점역이 아닌 경우 삭제할 수 없습니다.")
+    @DisplayName("2개의 구간에서 중간 역을 삭제할 수 있습니다.")
     void notDownStation() {
         // given
         long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
@@ -184,12 +184,20 @@ public class SectionAcceptanceTest {
         SectionAssuredTemplate.addSection(이호선_id, sectionRequest);
 
         // when
-        ExtractableResponse<Response> result = SectionAssuredTemplate.deleteSection(이호선_id, 역삼역_id)
+        SectionAssuredTemplate.deleteSection(이호선_id, 역삼역_id)
                 .then().log().all().extract();
 
         // then
-        Assertions.assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        Assertions.assertThat(result.body().asString()).isEqualTo(ErrorMessage.CANNOT_DELETE_SECTION.getMessage());
+        ExtractableResponse<Response> lineResult = LineAssuredTemplate.searchOneLine(이호선_id)
+                .then().log().all().extract();
+
+        Assertions.assertThat(lineResult.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(lineResult.jsonPath().getList("stations", LineStationsResponse.class)).hasSize(2)
+                .extracting("id", "name")
+                .containsExactly(
+                        Tuple.tuple(강남역_id, StationFixtures.FIRST_UP_STATION.getName()),
+                        Tuple.tuple(newDownStationId, StationFixtures.SECOND_DOWN_STATION.getName())
+                );
     }
 
     /**

@@ -3,6 +3,7 @@ package nextstep.subway.line.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.station.Station;
 
 import javax.persistence.*;
 import java.util.List;
@@ -34,12 +35,8 @@ public class Line {
         section.setMappingWithLine(this);
     }
 
-    public Section findDeleteTargetSectionByStationId(Long stationId) {
-        return sections.getDeleteTargetSection(stationId);
-    }
-
-    public void deleteSection(Section section) {
-        sections.deleteSection(section);
+    public void deleteSection(Station station) {
+        sections.deleteSection(station);
     }
 
     public void updateName(String newName) {

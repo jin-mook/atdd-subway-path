@@ -6,6 +6,7 @@ import nextstep.subway.exception.NoStationException;
 import nextstep.subway.line.SectionFixtures;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +66,7 @@ class LineTest {
                 );
     }
 
-    @DisplayName("노선 중간에 존재하는 역은 삭제할 수 없습니다.")
+    @DisplayName("노선 중간에 존재하는 역은 삭제할 수 있습니다.")
     @Test
     void canNotDeleteSectionMiddle() {
         // given
@@ -73,10 +74,24 @@ class LineTest {
         line.addSection(SectionFixtures.ADD_FIRST_SECTION);
         line.addSection(SectionFixtures.SECOND_SECTION);
         // when
+        line.deleteSection(StationFixtures.SECOND_UP_STATION);
         // then
-        Assertions.assertThatThrownBy(() -> line.findDeleteTargetSectionByStationId(StationFixtures.FIRST_DOWN_STATION.getId()))
-                .isInstanceOf(CannotDeleteSectionException.class)
-                .hasMessage(ErrorMessage.CANNOT_DELETE_SECTION.getMessage());
+        Assertions.assertThat(line.getSections()).hasSize(2)
+                .extracting("lineOrder", "upStation", "downStation", "distance")
+                .containsExactly(
+                        Tuple.tuple(
+                                1,
+                                StationFixtures.FIRST_UP_STATION,
+                                StationFixtures.FIRST_DOWN_STATION,
+                                10L
+                        ),
+                        Tuple.tuple(
+                                2,
+                                StationFixtures.FIRST_DOWN_STATION,
+                                StationFixtures.SECOND_DOWN_STATION,
+                                50L
+                        )
+                );
     }
 
     @DisplayName("노선 마지막에 존재하는 역은 삭제할 수 있습니다.")
@@ -87,8 +102,7 @@ class LineTest {
         line.addSection(SectionFixtures.ADD_FIRST_SECTION);
         line.addSection(SectionFixtures.SECOND_SECTION);
         // when
-        Section targetSection = line.findDeleteTargetSectionByStationId(StationFixtures.SECOND_DOWN_STATION.getId());
-        line.deleteSection(targetSection);
+        line.deleteSection(StationFixtures.SECOND_DOWN_STATION);
         // then
         Assertions.assertThat(line.getSections()).hasSize(2)
                 .containsExactly(

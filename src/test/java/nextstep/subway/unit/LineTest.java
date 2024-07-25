@@ -1,8 +1,7 @@
 package nextstep.subway.unit;
 
-import nextstep.subway.line.domain.Line;
-import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.SectionFixtures;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.station.StationFixtures;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
@@ -39,8 +38,7 @@ class LineTest {
         line.addSection(SectionFixtures.ADD_FIRST_SECTION);
 
         // when
-        Section targetSection = line.findDeleteTargetSectionByStationId(StationFixtures.SECOND_UP_STATION.getId());
-        line.deleteSection(targetSection);
+        line.deleteSection(StationFixtures.SECOND_UP_STATION);
 
         // then
         Assertions.assertThat(line.getSections()).hasSize(1)
