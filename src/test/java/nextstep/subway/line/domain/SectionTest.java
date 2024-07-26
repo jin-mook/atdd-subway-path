@@ -18,7 +18,7 @@ class SectionTest {
         // given
         // when
         // then
-        Assertions.assertThatThrownBy(() -> new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 0L))
+        Assertions.assertThatThrownBy(() -> Section.firstSection(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 0L))
                 .isInstanceOf(IllegalDistanceValueException.class)
                 .hasMessage(ErrorMessage.ILLEGAL_DISTANCE_VALUE.getMessage());
     }
@@ -29,7 +29,7 @@ class SectionTest {
         // given
         // when
         // then
-        Assertions.assertThatThrownBy(() -> new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_UP_STATION, 10L))
+        Assertions.assertThatThrownBy(() -> Section.firstSection(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_UP_STATION, 10L))
                 .isInstanceOf(NotSameUpAndDownStationException.class);
     }
 
@@ -37,7 +37,7 @@ class SectionTest {
     @ValueSource(longs = {5, 6})
     void decreaseDistanceBig(long distance) {
         // given
-        Section section = new Section(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 5L);
+        Section section = Section.firstSection(StationFixtures.FIRST_UP_STATION, StationFixtures.FIRST_DOWN_STATION, 5L);
         // when
         // then
         Assertions.assertThatThrownBy(() -> section.decreaseDistance(distance))

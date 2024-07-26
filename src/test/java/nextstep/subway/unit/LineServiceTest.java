@@ -33,7 +33,7 @@ public class LineServiceTest {
         Station upStation = stationRepository.save(StationFixtures.FIRST_UP_STATION);
         Station downStation = stationRepository.save(StationFixtures.FIRST_DOWN_STATION);
         stationRepository.save(StationFixtures.SECOND_UP_STATION);
-        Section section = new Section(upStation, downStation, 10L);
+        Section section = Section.firstSection(upStation, downStation, 10L);
         Line line = new Line("2호선", "green", section);
         Line savedLine = lineRepository.save(line);
 
