@@ -26,15 +26,12 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
 
-    private static final int DEFAULT_LINE_ORDER = 1;
-
     public LineResponse saveLine(LineRequest lineRequest) {
 
         Station upStation = stationService.findById(lineRequest.getUpStationId());
         Station downStation = stationService.findById(lineRequest.getDownStationId());
 
         Section section = Section.firstSection(upStation, downStation, lineRequest.getDistance());
-//        Section section = new Section(upStation, downStation, lineRequest.getDistance());
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), section);
         Line savedLine = lineRepository.save(line);
 
@@ -81,7 +78,6 @@ public class LineService {
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
 
         Section section = Section.firstSection(upStation, downStation, sectionRequest.getDistance());
-//        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
         line.addSection(section);
 
         return LineResponse.from(line);
@@ -91,9 +87,6 @@ public class LineService {
         Line line = findLineByIdWithSectionsAndStations(lineId);
 
         Station station = stationService.findById(stationId);
-
-//        Section targetSection = line.findDeleteTargetSectionByStationId(stationId);
-//        line.deleteSection(targetSection);
 
         line.deleteSection(station);
     }

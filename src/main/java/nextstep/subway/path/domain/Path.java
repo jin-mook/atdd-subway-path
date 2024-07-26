@@ -20,7 +20,6 @@ public class Path {
     }
 
     public List<Section> getSections() {
-//        return Collections.unmodifiableList(this.sections);
-        return sections;
+        return Collections.unmodifiableList(this.sections);
     }
 }

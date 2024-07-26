@@ -6,12 +6,10 @@ import nextstep.subway.path.domain.Path;
 import nextstep.subway.path.domain.PathRepository;
 import nextstep.subway.path.dto.PathResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class PathService {
 

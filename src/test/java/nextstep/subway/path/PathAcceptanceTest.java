@@ -5,7 +5,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.station.Station;
 import nextstep.subway.station.StationFixtures;
 import nextstep.subway.utils.LineAssuredTemplate;
 import nextstep.subway.utils.SectionAssuredTemplate;
@@ -17,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-
-import java.util.List;
 
 @Sql(scripts = {"/delete-data.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("경로 조회 기능")
