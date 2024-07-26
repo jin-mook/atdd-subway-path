@@ -89,14 +89,14 @@ public class LineAcceptanceTest {
 
         Assertions.assertThat(responseData.get(0).getStations()).hasSize(2)
                 .extracting("id", "name")
-                .contains(
+                .containsExactly(
                         Tuple.tuple(UP_STATION_ID, UP_STATION),
                         Tuple.tuple(DOWN_STATION_ID, DOWN_STATION)
                 );
 
         Assertions.assertThat(responseData.get(1).getStations()).hasSize(2)
                 .extracting("id", "name")
-                .contains(
+                .containsExactly(
                         Tuple.tuple(UP_STATION_ID, UP_STATION),
                         Tuple.tuple(newStationId, newStation)
                 );
@@ -126,7 +126,7 @@ public class LineAcceptanceTest {
         Assertions.assertThat(result.jsonPath().getString("color")).isEqualTo(COLOR);
         Assertions.assertThat(result.jsonPath().getList("stations")).hasSize(2)
                 .extracting("name")
-                .contains(UP_STATION, DOWN_STATION);
+                .containsExactly(UP_STATION, DOWN_STATION);
     }
 
     /**

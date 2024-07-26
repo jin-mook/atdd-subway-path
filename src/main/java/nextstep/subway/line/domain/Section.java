@@ -110,4 +110,8 @@ public class Section {
             this.lineOrder--;
         }
     }
+
+    public boolean isRightSection(Station upStation, Station downStation) {
+        return this.upStation.equals(upStation) && this.downStation.equals(downStation);
+    }
 }

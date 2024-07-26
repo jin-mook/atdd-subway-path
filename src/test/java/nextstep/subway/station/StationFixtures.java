@@ -17,4 +17,9 @@ public class StationFixtures {
     public static final Station 논현역 = new Station(9L, "논현역");
     public static final Station 고속터미널역 = new Station(10L, "고속터미널역");
     public static final Station 교대역 = new Station(11L, "교대역");
+
+    public static final Station 사당역 = new Station(12L, "사당역");
+    public static final Station 방배역 = new Station(13L, "방배역");
+
+
 }
