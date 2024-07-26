@@ -10,4 +10,11 @@ public class StationFixtures {
 
     public static final Station THIRD_UP_STATION = new Station(5L, "third 상행역");
     public static final Station THIRD_DOWN_STATION = new Station(6L, "third 하행역");
+
+
+    public static final Station 강남역 = new Station(7L, "강남역");
+    public static final Station 양재역 = new Station(8L, "양재역");
+    public static final Station 논현역 = new Station(9L, "논현역");
+    public static final Station 고속터미널역 = new Station(10L, "고속터미널역");
+    public static final Station 교대역 = new Station(11L, "교대역");
 }
