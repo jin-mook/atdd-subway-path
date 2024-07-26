@@ -109,15 +109,14 @@ public class Sections {
             throw new CannotDeleteSectionException(ErrorMessage.NO_STATION_EXIST);
         }
 
-        // 노선에 존재하는 상행역, 하행역을 삭제하는 경우
         if (isFirstStationOrLastStation(targetSections)) {
+            // 노선에 존재하는 상행역, 하행역을 삭제하는 경우
             Section section = targetSections.get(0);
             deleteExistSection(section);
-            return;
+        } else {
+            // 노선 중간에 존재하는 역을 삭제하는 경우
+            deleteMiddleStation(targetSections);
         }
-
-        // 노선 중간에 존재하는 역을 삭제하는 경우
-        deleteMiddleStation(targetSections);
     }
 
     private void deleteMiddleStation(List<Section> targetSections) {
