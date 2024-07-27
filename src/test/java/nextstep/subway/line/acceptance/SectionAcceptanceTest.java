@@ -174,7 +174,7 @@ public class SectionAcceptanceTest {
      * Then 노선 정보를 요청하면 중간 역이 정상 삭제된 것을 확인할 수 있습니다.
      */
     @Test
-    @DisplayName("2개의 구간에서 중간 역을 삭제할 수 있습니다.")
+    @DisplayName("2개의 구간에서 중간 역을 삭제할 수 있습니다. 이후 조회 시 삭제한 역은 조회되지 않습니다.")
     void notDownStation() {
         // given
         long newDownStationId = StationAssuredTemplate.createStation(StationFixtures.SECOND_DOWN_STATION.getName())
