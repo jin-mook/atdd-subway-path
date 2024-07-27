@@ -1,18 +1,19 @@
 package nextstep.subway.path.infrastructure;
 
 import nextstep.subway.common.ErrorMessage;
-import nextstep.subway.exception.NoStationException;
 import nextstep.subway.exception.NotConnectedStationException;
+import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.path.domain.Path;
-import nextstep.subway.path.domain.PathRepository;
+import nextstep.subway.path.domain.ShortestPathService;
 import nextstep.subway.station.Station;
 import nextstep.subway.station.StationFixtures;
-import nextstep.subway.utils.LineAssuredTemplate;
-import nextstep.subway.utils.SectionAssuredTemplate;
-import nextstep.subway.utils.StationAssuredTemplate;
+import nextstep.subway.station.StationRepository;
+import nextstep.subway.line.LineAssuredTemplate;
+import nextstep.subway.line.SectionAssuredTemplate;
+import nextstep.subway.station.StationAssuredTemplate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,17 +24,23 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Sql(scripts = {"/delete-data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class JgraphtPathRepositoryTest {
+class JgraphtShortestPathServiceTest {
 
     private long 논현역_id;
     private long 양재역_id;
+    private List<Section> sections;
 
     @Autowired
-    private PathRepository pathRepository;
+    private ShortestPathService shortestPathService;
+
+    @Autowired
+    private LineRepository lineRepository;
+
+    @Autowired
+    private StationRepository stationRepository;
 
     @BeforeEach
     void setUp() {
@@ -52,29 +59,11 @@ class JgraphtPathRepositoryTest {
 
         this.논현역_id = 논현역_id;
         this.양재역_id = 양재역_id;
-    }
 
-
-    @DisplayName("source 역이 존재하지 않으면 에러가 발생합니다.")
-    @Test
-    void noSource() {
-        // given
-        // when
-        // then
-        Assertions.assertThatThrownBy(() -> pathRepository.findShortestPath(Long.MAX_VALUE, 양재역_id))
-                .isInstanceOf(NoStationException.class)
-                .hasMessage(ErrorMessage.NO_STATION_EXIST.getMessage());
-    }
-
-    @DisplayName("target 역이 존재하지 않으면 에러가 발생합니다.")
-    @Test
-    void noTarget() {
-        // given
-        // when
-        // then
-        Assertions.assertThatThrownBy(() -> pathRepository.findShortestPath(논현역_id, Long.MAX_VALUE))
-                .isInstanceOf(NoStationException.class)
-                .hasMessage(ErrorMessage.NO_STATION_EXIST.getMessage());
+        this.sections = lineRepository.findAllWithSectionsAndStations()
+                .stream().flatMap(line -> line.getSections().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @DisplayName("source 역과 target 역이 연결되어 있지 않다면 에러가 발생합니다.")
@@ -85,9 +74,20 @@ class JgraphtPathRepositoryTest {
         long 방배역_id = StationAssuredTemplate.createStation(StationFixtures.방배역.getName()).then().extract().jsonPath().getLong("id");
         LineAssuredTemplate.createLine(new LineRequest("2호선", "green", 사당역_id, 방배역_id, 4L))
                 .then().extract().jsonPath().getLong("id");
+
+        Station sourceStation = stationRepository.findById(논현역_id).get();
+        Station targetStation = stationRepository.findById(사당역_id).get();
+
+
+        List<Section> sections = lineRepository.findAllWithSectionsAndStations()
+                .stream().flatMap(line -> line.getSections().stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+
         // when
         // then
-        Assertions.assertThatThrownBy(() -> pathRepository.findShortestPath(논현역_id, 사당역_id))
+        Assertions.assertThatThrownBy(() -> shortestPathService.findShortestPath(sections, sourceStation, targetStation))
                 .isInstanceOf(NotConnectedStationException.class)
                 .hasMessage(ErrorMessage.NOT_CONNECTED_STATION.getMessage());
     }
@@ -97,16 +97,14 @@ class JgraphtPathRepositoryTest {
     void shortestSections() {
         // given
         // when
-        Path path = pathRepository.findShortestPath(논현역_id, 양재역_id);
-        List<Section> shortestPath = path.getSections();
+        Station sourceStation = stationRepository.findById(논현역_id).get();
+        Station targetStation = stationRepository.findById(양재역_id).get();
+
+
+        Path path = shortestPathService.findShortestPath(sections, sourceStation, targetStation);
+        List<Station> stationList = path.getStations();
 
         // then
-        Assertions.assertThat(shortestPath).hasSize(3);
-
-        List<Station> stationList = shortestPath.stream().flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-                .distinct()
-                .collect(Collectors.toList());
-
         Assertions.assertThat(stationList).hasSize(4)
                 .extracting("name")
                 .containsExactly(
@@ -115,5 +113,6 @@ class JgraphtPathRepositoryTest {
                         StationFixtures.교대역.getName(),
                         StationFixtures.양재역.getName()
                 );
+        Assertions.assertThat(path.getDistance()).isEqualTo(6);
     }
 }

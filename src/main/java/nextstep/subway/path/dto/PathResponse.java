@@ -23,6 +23,14 @@ public class PathResponse {
         this.distance = distance;
     }
 
+    public static PathResponse from(Path path) {
+        List<LineStationsResponse> stations = path.getStations().stream()
+                .map(LineStationsResponse::new)
+                .collect(Collectors.toList());
+
+        return new PathResponse(stations, path.getDistance());
+    }
+
     public static PathResponse from(List<Section> sections, long distance) {
         List<LineStationsResponse> stations = sections.stream().flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
                 .distinct()
