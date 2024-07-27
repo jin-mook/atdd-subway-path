@@ -44,7 +44,7 @@ class LineTest {
         line.addSection(SectionFixtures.ADD_FIRST_SECTION);
         // when
         // then
-        Assertions.assertThatThrownBy(() -> line.addSection(new Section(StationFixtures.THIRD_UP_STATION, StationFixtures.THIRD_DOWN_STATION, 10L)))
+        Assertions.assertThatThrownBy(() -> line.addSection(Section.firstSection(StationFixtures.THIRD_UP_STATION, StationFixtures.THIRD_DOWN_STATION, 10L)))
                 .isInstanceOf(NoStationException.class)
                 .hasMessage(ErrorMessage.CANNOT_ADD_STATION.getMessage());
     }

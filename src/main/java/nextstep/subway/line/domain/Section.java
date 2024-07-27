@@ -34,15 +34,6 @@ public class Section {
 
     private Long distance;
 
-    // TODO: 7/25/24 Section 의 생명 주기를 Line으로 통합할 수 있을것 같음...
-    public Section(Station upStation, Station downStation, Long distance) {
-        this(1, upStation, downStation, distance);
-    }
-
-    public Section(Integer lineOrder, Station upStation, Station downStation, Long distance) {
-        this(null, lineOrder, upStation, downStation, distance);
-    }
-
     private Section(Line line, Integer lineOrder, Station upStation, Station downStation, Long distance) {
         if (upStation.equals(downStation)) {
             throw new NotSameUpAndDownStationException(ErrorMessage.NOT_SAME_UP_AND_DOWN_STATION);
@@ -56,6 +47,10 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public static Section firstSection(Station upStation, Station downStation, Long distance) {
+        return new Section(null, null, upStation, downStation, distance);
     }
 
     public static Section joinSections(Section upSection, Section downSection) {
@@ -114,5 +109,9 @@ public class Section {
         if (this.lineOrder > section.lineOrder) {
             this.lineOrder--;
         }
+    }
+
+    public boolean isRightSection(Station upStation, Station downStation) {
+        return this.upStation.equals(upStation) && this.downStation.equals(downStation);
     }
 }

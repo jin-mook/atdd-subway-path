@@ -31,7 +31,7 @@ public class LineService {
         Station upStation = stationService.findById(lineRequest.getUpStationId());
         Station downStation = stationService.findById(lineRequest.getDownStationId());
 
-        Section section = new Section(upStation, downStation, lineRequest.getDistance());
+        Section section = Section.firstSection(upStation, downStation, lineRequest.getDistance());
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), section);
         Line savedLine = lineRepository.save(line);
 
@@ -77,7 +77,7 @@ public class LineService {
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
 
-        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        Section section = Section.firstSection(upStation, downStation, sectionRequest.getDistance());
         line.addSection(section);
 
         return LineResponse.from(line);
@@ -87,9 +87,6 @@ public class LineService {
         Line line = findLineByIdWithSectionsAndStations(lineId);
 
         Station station = stationService.findById(stationId);
-
-//        Section targetSection = line.findDeleteTargetSectionByStationId(stationId);
-//        line.deleteSection(targetSection);
 
         line.deleteSection(station);
     }

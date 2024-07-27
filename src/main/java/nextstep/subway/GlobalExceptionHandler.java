@@ -23,4 +23,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> sectionException(Exception exception) {
         return ErrorResponse.badRequest(exception.getMessage());
     }
+
+    @ExceptionHandler(NotConnectedStationException.class)
+    public ResponseEntity<String> pathException(Exception exception) {
+        return ErrorResponse.badRequest(exception.getMessage());
+    }
 }
